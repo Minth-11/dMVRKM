@@ -1,0 +1,28 @@
+[2024-07-02 16:44:02,544][main][INFO] - 
+
+ Config: {'data': {'_target_': 'srcs.data_loader.data_loaders.santafe_Dataloader', 'data_dir': '${hydra:runtime.cwd}/datasets', 'training': True}, 'name': 'primal_dual_test', 'arch': {'_target_': 'srcs.model.MV_RKM_nar_primal.Multiview_RKM_NAR_primal'}, 'log_dir': '${name}/', 'resume': None, 'verbose': True, 'metrics': [{'_target_': 'srcs.model.metric.MSE'}, {'_target_': 'srcs.model.metric.MAE'}], 'hyperparameters': {'device': 'cpu', 'decomposition_method': 'svd', 'lag': 70, 'n_steps_ahead': 1, 's': 144, 'kernel_x': 'rbf', 'sigma_x': 2.1856, 'center_K_x': True, 'kernel_y': 'linear', 'sigma_y': 0.1925, 'center_K_y': True, 'pre_image_method': 'kernel_smoother', 'nearest_neighbours': 1, 'approximator_x': 'rff', 'approximator_y': 'rff', 'DIM_FEATURES_x': 5000, 'DIM_FEATURES_y': 5000}}
+
+[2024-07-02 16:44:02,666][openml.config][INFO] - No config file found at /users/sista/zopdebee/.config/openml/config, using default configuration.
+[2024-07-02 16:44:11,705][srcs.model.MV_RKM_nar_primal][INFO] - 
+Saved model: /volume1/scratch/zopdebee/GitHub/dMVRKM/outputs/2024-07-02/16-44-02/model_primal.pt
+[2024-07-02 16:44:11,706][srcs.model.eval_MV_RKM_nar][INFO] - Loading pre-trained model: /volume1/scratch/zopdebee/GitHub/dMVRKM/outputs/2024-07-02/16-44-02/model_primal.pt
+[2024-07-02 16:44:12,383][srcs.model.eval_MV_RKM_nar][INFO] - 
+Metric for primal model: 
+        Metrics          Value  
+0  ||H.T @ H - I_s||  8.707e-14
+1     Test error MSE  4.998e+02
+2     Test error MAE  1.551e+01
+[2024-07-02 16:44:27,741][main][INFO] - 
+
+ Config: {'data': {'_target_': 'srcs.data_loader.data_loaders.santafe_Dataloader', 'data_dir': '${hydra:runtime.cwd}/datasets', 'training': True}, 'name': 'primal_dual_test', 'arch': {'_target_': 'srcs.model.MV_RKM_nar_dual.Multiview_RKM_NAR_Dual'}, 'log_dir': '${name}/', 'resume': None, 'verbose': True, 'metrics': [{'_target_': 'srcs.model.metric.MSE'}, {'_target_': 'srcs.model.metric.MAE'}], 'hyperparameters': {'device': 'cpu', 'decomposition_method': 'svd', 'lag': 70, 'n_steps_ahead': 1, 's': 144, 'kernel_x': 'rbf', 'sigma_x': 2.1856, 'center_K_x': True, 'kernel_y': 'linear', 'sigma_y': 0.1925, 'center_K_y': True, 'pre_image_method': 'kernel_smoother', 'nearest_neighbours': 1, 'approximator_x': 'rff', 'approximator_y': 'rff', 'DIM_FEATURES_x': 5000, 'DIM_FEATURES_y': 5000}}
+
+[2024-07-02 16:44:28,148][srcs.model.MV_RKM_nar_dual][INFO] - 
+Saved model: /volume1/scratch/zopdebee/GitHub/dMVRKM/outputs/2024-07-02/16-44-02/model_Dual.pt
+[2024-07-02 16:44:28,148][srcs.model.eval_MV_RKM_nar][INFO] - Loading pre-trained model: /volume1/scratch/zopdebee/GitHub/dMVRKM/outputs/2024-07-02/16-44-02/model_Dual.pt
+[2024-07-02 16:44:37,583][srcs.model.eval_MV_RKM_nar][INFO] - 
+Metric for Dual model: 
+        Metrics          Value  
+0  ||H.T @ H - I_s||  1.818e-14
+1     Test error MSE  4.333e+02
+2     Test error MAE  1.524e+01
+[2024-07-02 16:44:49,581][main][INFO] - --END--

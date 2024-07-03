@@ -1,0 +1,33 @@
+data:
+  _target_: srcs.data_loader.data_loaders.santafe_Dataloader
+  data_dir: ${hydra:runtime.cwd}/datasets
+  training: true
+name: primal_dual_test
+arch:
+  _target_:
+  - srcs.model.MV_RKM_nar_primal.Multiview_RKM_NAR_primal
+  - srcs.model.MV_RKM_nar_dual.Multiview_RKM_NAR_Dual
+log_dir: ${name}/
+resume: null
+verbose: true
+metrics:
+- _target_: srcs.model.metric.MSE
+- _target_: srcs.model.metric.MAE
+hyperparameters:
+  device: cpu
+  decomposition_method: svd
+  lag: 70
+  n_steps_ahead: 1
+  s: 144
+  kernel_x: rbf
+  sigma_x: 2.1856
+  center_K_x: true
+  kernel_y: linear
+  sigma_y: 0.1925
+  center_K_y: true
+  pre_image_method: kernel_smoother
+  nearest_neighbours: 1
+  approximator_x: rff
+  approximator_y: rff
+  DIM_FEATURES_x: 5000
+  DIM_FEATURES_y: 5000
