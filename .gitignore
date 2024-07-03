@@ -1,0 +1,6 @@
+
+MNISTNN/datasets/t10k-images-idx3-ubyte.gz
+MNISTNN/datasets/t10k-labels-idx1-ubyte.gz
+MNISTNN/datasets/train-images-idx3-ubyte.gz
+MNISTNN/datasets/train-labels-idx1-ubyte.gz
+/data
