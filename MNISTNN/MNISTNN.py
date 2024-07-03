@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from torchvision import datasets, transforms
 from dataclasses import dataclass
 from torch.utils.data import DataLoader
 import torchvision.transforms as T
 from torch.autograd import Variable
+import copy
 
 device = (
     "cuda"
@@ -17,7 +18,8 @@ device = (
 print(f"Using {device} device")
 
 def main():
-    train_data = datasets.MNIST('../data', train=True,  download=True, transform=T.ToTensor())
+    train_tot = datasets.MNIST('../data', train=True,  download=True, transform=T.ToTensor())
+    train_data, val_data = torch.utils.data.random_split(train_tot, [50000, 10000])
     test_data = datasets.MNIST('../data', train=False, download=True, transform=T.ToTensor())
     loaders = {
     'train' : torch.utils.data.DataLoader(train_data,
@@ -29,19 +31,29 @@ def main():
                                           batch_size=100,
                                           shuffle=True,
                                           num_workers=1),
+    'val'   : torch.utils.data.DataLoader(val_data,
+                                          batch_size=10000, # use all for validation
+                                          shuffle=True,
+                                          num_workers=1),
     }
 
     model = Model()
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    nEpochs = 10
-    train(nEpochs, model, loaders, criterion, optimizer)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    nEpochs = 100
+    patience = 35
+    train(nEpochs, model, loaders, criterion, optimizer,patience)
     test(model,loaders)
 
-def train(nEpochs, model, loaders, loss_func, optimizer):
+def train(nEpochs, model, loaders, loss_func, optimizer, patience):
     model.train()
     total_step = len(loaders['train'])
-    for epoch in range(nEpochs):
+    bestLoss = float('inf')
+    best_model_weights = None
+    patCtr = patience
+    loopObj = tqdm(range(nEpochs))
+    for epoch in loopObj:
+        model.train()
         for i, (images, labels) in enumerate(loaders['train']):
             # gives batch data, normalize x when iterate train_loader
             b_x = Variable(images)   # batch x
@@ -53,9 +65,33 @@ def train(nEpochs, model, loaders, loss_func, optimizer):
             # backpropagation, compute gradients
             loss.backward()                # apply gradients
             optimizer.step()
-            if (i+1) % 100 == 0:
-                print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
-                       .format(epoch + 1, nEpochs, i + 1, total_step, loss.item()))
+
+        def barInfo():
+            desc = "v:{:.3f} b:".format(valLoss.item()) + "{:.3f}".format(bestLoss) + " p:" + str(patCtr)
+            loopObj.set_description(desc)
+
+        # validation
+        model.eval()
+        with torch.no_grad():
+            for i, (images, labels) in enumerate(loaders['val']):
+                b_x = Variable(images)   # batch x
+                b_y = Variable(labels)   # batch y
+                output = model(b_x)[0]
+                valLoss = loss_func(output, b_y)
+                barInfo()
+        if valLoss < bestLoss:
+            bestLoss = valLoss
+            best_model_weights = copy.deepcopy(model.state_dict())
+            patCtr = patience
+            barInfo()
+        else:
+            patCtr -= 1
+            if patCtr == 0:
+                barInfo()
+                print("Patience ran out")
+                break
+    # use best model on val
+    model.load_state_dict(best_model_weights)
 
 def test(model,loaders):
     model.eval()
@@ -66,7 +102,7 @@ def test(model,loaders):
             test_output, last_layer = model(images)
             pred_y = torch.max(test_output, 1)[1].data.squeeze()
             accuracy = (pred_y == labels).sum().item() / float(labels.size(0))
-    print('Test Accuracy of the model on the 10000 test images: %.2f' % accuracy)
+    print('Test Accuracy of the model on the 10000 test images: %.4f' % accuracy)
 
 class Model(nn.Module):
     def __init__(self):
