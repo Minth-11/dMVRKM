@@ -8,14 +8,7 @@ import torchvision.transforms as T
 from torch.autograd import Variable
 import copy
 
-device = (
-    "cuda"
-    if torch.cuda.is_available()
-    else "mps"
-    if torch.backends.mps.is_available()
-    else "cpu"
-)
-print(f"Using {device} device")
+
 
 def main():
     train_tot = datasets.MNIST('../data', train=True,  download=True, transform=T.ToTensor())
@@ -25,8 +18,8 @@ def main():
     'train' : torch.utils.data.DataLoader(train_data,
                                           batch_size=100,
                                           shuffle=True,
-                                          num_workers=1),
-
+                                          num_workers=1,
+                                          ),
     'test'  : torch.utils.data.DataLoader(test_data,
                                           batch_size=100,
                                           shuffle=True,
@@ -41,9 +34,15 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     nEpochs = 100
-    patience = 35
+    patience = 15
     train(nEpochs, model, loaders, criterion, optimizer,patience)
     test(model,loaders)
+    torch.save(model,"mnist.pth")
+    model = torch.load("mnist.pth")
+    test(model,loaders)
+    model = torch.load("mnist.pth")
+    test(model,loaders)
+    print(model)
 
 def train(nEpochs, model, loaders, loss_func, optimizer, patience):
     model.train()
