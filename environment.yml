@@ -1,4 +1,4 @@
-name: rkm_env
+name: dMVRKM
 channels:
   - https://repo.anaconda.com/pkgs/free
   - anaconda
